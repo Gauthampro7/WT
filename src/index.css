@@ -1,0 +1,239 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light Theme */
+  --theme-light-bg: #ffffff;
+  --theme-light-surface: #f8f9fa;
+  --theme-light-card: #ffffff;
+  --theme-light-text: #1a1a1a;
+  --theme-light-text-secondary: #6b7280;
+  --theme-light-accent: #3b82f6;
+  --theme-light-accent-hover: #2563eb;
+  --theme-light-border: rgba(0, 0, 0, 0.1);
+  --theme-light-shadow: rgba(0, 0, 0, 0.1);
+  --theme-light-glow: rgba(59, 130, 246, 0.3);
+
+  /* Dark Theme */
+  --theme-dark-bg: #0f172a;
+  --theme-dark-surface: #1e293b;
+  --theme-dark-card: #1e293b;
+  --theme-dark-text: #f1f5f9;
+  --theme-dark-text-secondary: #94a3b8;
+  --theme-dark-accent: #60a5fa;
+  --theme-dark-accent-hover: #3b82f6;
+  --theme-dark-border: rgba(255, 255, 255, 0.1);
+  --theme-dark-shadow: rgba(0, 0, 0, 0.3);
+  --theme-dark-glow: rgba(96, 165, 250, 0.4);
+
+  /* Midnight Theme */
+  --theme-midnight-bg: #0f172a;
+  --theme-midnight-surface: #1e293b;
+  --theme-midnight-card: rgba(30, 41, 59, 0.6);
+  --theme-midnight-text: #e2e8f0;
+  --theme-midnight-text-secondary: #94a3b8;
+  --theme-midnight-accent: #64748b;
+  --theme-midnight-accent-hover: #475569;
+  --theme-midnight-border: rgba(255, 255, 255, 0.1);
+  --theme-midnight-shadow: rgba(0, 0, 0, 0.4);
+  --theme-midnight-glow: rgba(100, 116, 139, 0.3);
+
+  /* Cyberpunk Theme */
+  --theme-cyberpunk-bg: #000000;
+  --theme-cyberpunk-surface: #0a0a0a;
+  --theme-cyberpunk-card: rgba(10, 10, 10, 0.8);
+  --theme-cyberpunk-text: #ffffff;
+  --theme-cyberpunk-text-secondary: #a0a0a0;
+  --theme-cyberpunk-accent: #ff00ff;
+  --theme-cyberpunk-accent-hover: #ff00ff;
+  --theme-cyberpunk-border: rgba(0, 255, 255, 0.5);
+  --theme-cyberpunk-shadow: rgba(255, 0, 255, 0.5);
+  --theme-cyberpunk-glow: rgba(255, 0, 255, 0.8);
+
+  /* Emerald Theme */
+  --theme-emerald-bg: #064e3b;
+  --theme-emerald-surface: #065f46;
+  --theme-emerald-card: rgba(6, 95, 70, 0.7);
+  --theme-emerald-text: #d1fae5;
+  --theme-emerald-text-secondary: #a7f3d0;
+  --theme-emerald-accent: #10b981;
+  --theme-emerald-accent-hover: #059669;
+  --theme-emerald-border: rgba(16, 185, 129, 0.3);
+  --theme-emerald-shadow: rgba(6, 78, 59, 0.5);
+  --theme-emerald-glow: rgba(16, 185, 129, 0.4);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Theme Classes */
+.theme-light {
+  --bg: var(--theme-light-bg);
+  --surface: var(--theme-light-surface);
+  --card: var(--theme-light-card);
+  --text: var(--theme-light-text);
+  --text-secondary: var(--theme-light-text-secondary);
+  --accent: var(--theme-light-accent);
+  --accent-hover: var(--theme-light-accent-hover);
+  --border: var(--theme-light-border);
+  --shadow: var(--theme-light-shadow);
+  --glow: var(--theme-light-glow);
+}
+
+.theme-dark {
+  --bg: var(--theme-dark-bg);
+  --surface: var(--theme-dark-surface);
+  --card: var(--theme-dark-card);
+  --text: var(--theme-dark-text);
+  --text-secondary: var(--theme-dark-text-secondary);
+  --accent: var(--theme-dark-accent);
+  --accent-hover: var(--theme-dark-accent-hover);
+  --border: var(--theme-dark-border);
+  --shadow: var(--theme-dark-shadow);
+  --glow: var(--theme-dark-glow);
+}
+
+.theme-midnight {
+  --bg: var(--theme-midnight-bg);
+  --surface: var(--theme-midnight-surface);
+  --card: var(--theme-midnight-card);
+  --text: var(--theme-midnight-text);
+  --text-secondary: var(--theme-midnight-text-secondary);
+  --accent: var(--theme-midnight-accent);
+  --accent-hover: var(--theme-midnight-accent-hover);
+  --border: var(--theme-midnight-border);
+  --shadow: var(--theme-midnight-shadow);
+  --glow: var(--theme-midnight-glow);
+}
+
+.theme-cyberpunk {
+  --bg: var(--theme-cyberpunk-bg);
+  --surface: var(--theme-cyberpunk-surface);
+  --card: var(--theme-cyberpunk-card);
+  --text: var(--theme-cyberpunk-text);
+  --text-secondary: var(--theme-cyberpunk-text-secondary);
+  --accent: var(--theme-cyberpunk-accent);
+  --accent-hover: var(--theme-cyberpunk-accent-hover);
+  --border: var(--theme-cyberpunk-border);
+  --shadow: var(--theme-cyberpunk-shadow);
+  --glow: var(--theme-cyberpunk-glow);
+}
+
+.theme-emerald {
+  --bg: var(--theme-emerald-bg);
+  --surface: var(--theme-emerald-surface);
+  --card: var(--theme-emerald-card);
+  --text: var(--theme-emerald-text);
+  --text-secondary: var(--theme-emerald-text-secondary);
+  --accent: var(--theme-emerald-accent);
+  --accent-hover: var(--theme-emerald-accent-hover);
+  --border: var(--theme-emerald-border);
+  --shadow: var(--theme-emerald-shadow);
+  --glow: var(--theme-emerald-glow);
+}
+
+/* Glassmorphic Effects */
+.glass {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px 0 var(--shadow);
+}
+
+.glass-card {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px 0 var(--shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 48px 0 var(--shadow);
+}
+
+/* Utility Classes */
+.bg-theme {
+  background-color: var(--bg);
+}
+
+.text-theme {
+  color: var(--text);
+}
+
+.text-theme-secondary {
+  color: var(--text-secondary);
+}
+
+.border-theme {
+  border-color: var(--border);
+}
+
+.accent-theme {
+  color: var(--accent);
+}
+
+.bg-accent-theme {
+  background-color: var(--accent);
+}
+
+.bg-accent-theme:hover {
+  background-color: var(--accent-hover);
+}
+
+.glow-theme {
+  box-shadow: 0 0 20px var(--glow);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Animation improvements */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

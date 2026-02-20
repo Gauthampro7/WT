@@ -1,0 +1,114 @@
+-- SkillSwap Database Schema for Supabase
+-- Run this SQL in your Supabase SQL Editor
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Create users table (Supabase Auth handles this, but we'll create a profiles table)
+CREATE TABLE IF NOT EXISTS public.users (
+  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  name TEXT,
+  email TEXT,
+  picture TEXT,
+  university TEXT DEFAULT '',
+  location TEXT DEFAULT '',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Create skills table
+CREATE TABLE IF NOT EXISTS public.skills (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN ('Tech', 'Arts', 'Academic', 'Life Skills')),
+  type TEXT NOT NULL CHECK (type IN ('Offering', 'Seeking')),
+  location TEXT DEFAULT '',
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'completed', 'cancelled')),
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Create indexes for better query performance
+CREATE INDEX IF NOT EXISTS idx_skills_user_id ON public.skills(user_id);
+CREATE INDEX IF NOT EXISTS idx_skills_category ON public.skills(category);
+CREATE INDEX IF NOT EXISTS idx_skills_type ON public.skills(type);
+CREATE INDEX IF NOT EXISTS idx_skills_status ON public.skills(status);
+CREATE INDEX IF NOT EXISTS idx_skills_created_at ON public.skills(created_at DESC);
+
+-- Create full-text search index
+CREATE INDEX IF NOT EXISTS idx_skills_search ON public.skills USING gin(to_tsvector('english', title || ' ' || description));
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.skills ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for users table
+-- Anyone can read user profiles
+CREATE POLICY "Users are viewable by everyone" ON public.users
+  FOR SELECT USING (true);
+
+-- Users can update their own profile
+CREATE POLICY "Users can update own profile" ON public.users
+  FOR UPDATE USING (auth.uid() = id);
+
+-- Users can insert their own profile
+CREATE POLICY "Users can insert own profile" ON public.users
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- RLS Policies for skills table
+-- Anyone can read active skills
+CREATE POLICY "Skills are viewable by everyone" ON public.skills
+  FOR SELECT USING (status = 'active');
+
+-- Authenticated users can create skills
+CREATE POLICY "Authenticated users can create skills" ON public.skills
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated' AND auth.uid() = user_id);
+
+-- Users can update their own skills
+CREATE POLICY "Users can update own skills" ON public.skills
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Users can delete their own skills
+CREATE POLICY "Users can delete own skills" ON public.skills
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Function to automatically create user profile on signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.users (id, name, email, picture)
+  VALUES (
+    NEW.id,
+    NEW.raw_user_meta_data->>'name',
+    NEW.email,
+    NEW.raw_user_meta_data->>'picture'
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to create user profile on signup
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Function to update updated_at timestamp
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = TIMEZONE('utc'::text, NOW());
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Triggers for updated_at
+CREATE TRIGGER update_users_updated_at
+  BEFORE UPDATE ON public.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+CREATE TRIGGER update_skills_updated_at
+  BEFORE UPDATE ON public.skills
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
