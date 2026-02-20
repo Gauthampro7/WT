@@ -1,43 +1,41 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle, Sparkles } from 'lucide-react';
+import { X, CheckCircle, Sparkles, LayoutDashboard } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export const TradeModal = ({ isOpen, onClose, skill }) => {
+export const TradeModal = ({ isOpen, onClose, skill, onViewDashboard }) => {
   useEffect(() => {
-    if (!isOpen) return;
+    if (isOpen) {
+      // Trigger confetti
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-    const duration = 3000;
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-    function randomInRange(min, max) {
-      return Math.random() * (max - min) + min;
-    }
-
-    const intervalId = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        clearInterval(intervalId);
-        return;
+      function randomInRange(min, max) {
+        return Math.random() * (max - min) + min;
       }
 
-      const particleCount = 50 * (timeLeft / duration);
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
 
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-      });
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-      });
-    }, 250);
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
 
-    return () => clearInterval(intervalId);
+        const particleCount = 50 * (timeLeft / duration);
+
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+        });
+      }, 250);
+    }
   }, [isOpen]);
 
   if (!skill) return null;
@@ -131,22 +129,38 @@ export const TradeModal = ({ isOpen, onClose, skill }) => {
                   transition={{ delay: 0.5 }}
                   className="text-theme-secondary text-sm"
                 >
-                  The user will be notified of your request. Check your messages for updates!
+                  Track status in your Dashboard under &quot;Requests I sent&quot;.
                 </motion.p>
 
-                {/* Action Button */}
-                <motion.button
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onClose}
-                  className="w-full px-6 py-3 bg-accent-theme text-white rounded-xl font-semibold hover:glow-theme transition-all flex items-center justify-center gap-2"
+                  className="flex gap-3"
                 >
-                  <CheckCircle size={20} />
-                  Got it!
-                </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onClose}
+                    className="flex-1 px-6 py-3 glass text-theme rounded-xl font-semibold"
+                  >
+                    Got it!
+                  </motion.button>
+                  {onViewDashboard && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        onClose();
+                        onViewDashboard();
+                      }}
+                      className="flex-1 px-6 py-3 bg-accent-theme text-white rounded-xl font-semibold hover:glow-theme transition-all flex items-center justify-center gap-2"
+                    >
+                      <LayoutDashboard size={20} />
+                      View in Dashboard
+                    </motion.button>
+                  )}
+                </motion.div>
               </div>
             </div>
           </motion.div>

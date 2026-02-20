@@ -208,33 +208,42 @@ export const skillsService = {
     }
   },
 
-  // Request trade
-  async requestTrade(skillId) {
+  // Request trade (creates a trade_requests row via tradesService)
+  async requestTrade(skillId, message = '') {
+    const { tradesService } = await import('./tradesService');
+    return tradesService.create(skillId, message);
+  },
+
+  // Get my skills (for dashboard)
+  async getMySkills() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
+    if (!user) throw new Error('You must be logged in');
 
-    if (!user) {
-      throw new Error('You must be logged in to request a trade');
-    }
-
-    // Get skill to check ownership
-    const { data: skill } = await supabase
+    const { data, error } = await supabase
       .from('skills')
-      .select('user_id')
-      .eq('id', skillId)
-      .single();
+      .select(
+        `*,
+        user:users(id, name, email, picture, university, location)`
+      )
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
 
-    if (!skill) {
-      throw new Error('Skill not found');
-    }
+    if (error) throw new Error(error.message);
 
-    if (skill.user_id === user.id) {
-      throw new Error('Cannot request trade for your own skill');
-    }
-
-    // In a real app, you'd create a trade request record here
-    // For now, we'll just return success
-    return { success: true, message: 'Trade request sent successfully' };
+    return (data || []).map((skill) => ({
+      id: skill.id,
+      title: skill.title,
+      description: skill.description,
+      category: skill.category,
+      type: skill.type,
+      location: skill.location,
+      status: skill.status,
+      user: skill.user?.name || 'Unknown',
+      user_id: skill.user_id,
+      userData: skill.user,
+      createdAt: skill.created_at,
+    }));
   },
 };

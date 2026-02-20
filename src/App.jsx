@@ -10,9 +10,13 @@ import { SkillCard } from './components/SkillCard';
 import { TradeModal } from './components/TradeModal';
 import { CreateSkillModal } from './components/CreateSkillModal';
 import { skillsService } from './services/skillsService';
-import { Sparkles, Plus, Loader2 } from 'lucide-react';
+import { Dashboard } from './components/Dashboard/Dashboard';
+import { Sparkles, Plus, Loader2, LayoutDashboard, Compass } from 'lucide-react';
+import { useAuth } from './contexts/AuthContext';
 
 function AppContent() {
+  const { isAuthenticated } = useAuth();
+  const [view, setView] = useState('browse'); // 'browse' | 'dashboard'
   const [skills, setSkills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -109,6 +113,30 @@ function AppContent() {
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-3"
             >
+              {isAuthenticated && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setView(view === 'dashboard' ? 'browse' : 'dashboard')}
+                  className={`flex items-center gap-2 glass px-4 py-2 rounded-lg font-medium ${
+                    view === 'dashboard'
+                      ? 'bg-accent-theme text-white'
+                      : 'text-theme hover:bg-accent-theme/10'
+                  }`}
+                >
+                  {view === 'dashboard' ? (
+                    <>
+                      <Compass size={18} />
+                      Browse
+                    </>
+                  ) : (
+                    <>
+                      <LayoutDashboard size={18} />
+                      Dashboard
+                    </>
+                  )}
+                </motion.button>
+              )}
               <LoginButton />
               <ThemeSelector />
             </motion.div>
@@ -118,6 +146,10 @@ function AppContent() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {view === 'dashboard' ? (
+          <Dashboard onGoToBrowse={() => setView('browse')} />
+        ) : (
+          <>
         {/* Search and Filter */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -196,6 +228,8 @@ function AppContent() {
             </div>
           </motion.div>
         )}
+          </>
+        )}
       </main>
 
       {/* Trade Modal */}
@@ -203,6 +237,7 @@ function AppContent() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         skill={selectedSkill}
+        onViewDashboard={() => setView('dashboard')}
       />
 
       {/* Create Skill Modal */}

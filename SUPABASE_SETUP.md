@@ -39,7 +39,10 @@ This guide will walk you through setting up Supabase for SkillSwap with Google O
 4. Click **Run** (or press Ctrl+Enter)
 5. Verify tables were created:
    - Go to **Table Editor**
-   - You should see `users` and `skills` tables
+   - You should see `users`, `skills`, and `trade_requests` tables
+
+**If you already ran the schema before and don’t have `trade_requests`:**
+- Run the SQL in `supabase-migration-trade-requests.sql` in the SQL Editor instead.
 
 ## Step 4: Configure Environment Variables
 
