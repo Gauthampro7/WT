@@ -5,37 +5,39 @@ import confetti from 'canvas-confetti';
 
 export const TradeModal = ({ isOpen, onClose, skill }) => {
   useEffect(() => {
-    if (isOpen) {
-      // Trigger confetti
-      const duration = 3000;
-      const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    if (!isOpen) return;
 
-      function randomInRange(min, max) {
-        return Math.random() * (max - min) + min;
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    const intervalId = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        clearInterval(intervalId);
+        return;
       }
 
-      const interval = setInterval(() => {
-        const timeLeft = animationEnd - Date.now();
+      const particleCount = 50 * (timeLeft / duration);
 
-        if (timeLeft <= 0) {
-          return clearInterval(interval);
-        }
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+      });
+    }, 250);
 
-        const particleCount = 50 * (timeLeft / duration);
-
-        confetti({
-          ...defaults,
-          particleCount,
-          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-        });
-        confetti({
-          ...defaults,
-          particleCount,
-          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-        });
-      }, 250);
-    }
+    return () => clearInterval(intervalId);
   }, [isOpen]);
 
   if (!skill) return null;
