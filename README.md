@@ -60,11 +60,7 @@ An ultra-aesthetic, professional skill-exchange platform for college students bu
    npm run dev
    ```
 
-5. **Open your browser** and navigate to `http://localhost:5173`
-
-### First Time Setup
-
-For detailed step-by-step instructions, see [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)
+5. Open `http://localhost:5173`
 
 ### Build for Production
 
@@ -77,25 +73,17 @@ The built files will be in the `dist` directory.
 ## Project Structure
 
 ```
-skillswap/
 ├── src/
 │   ├── components/       # React components
-│   │   ├── BentoGrid.jsx
-│   │   ├── SearchFilter.jsx
-│   │   ├── SkillCard.jsx
-│   │   ├── ThemeSelector.jsx
-│   │   └── TradeModal.jsx
-│   ├── contexts/         # React Context providers
-│   │   └── ThemeContext.jsx
-│   ├── data/            # Sample data
-│   │   └── skills.js
-│   ├── App.jsx          # Main app component
-│   ├── main.jsx         # Entry point
-│   └── index.css        # Global styles and themes
+│   ├── contexts/         # Theme & Auth providers
+│   ├── services/         # Supabase API layer
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
 ├── index.html
 ├── package.json
-├── tailwind.config.js
-├── vite.config.js
+├── supabase-schema.sql
+├── supabase-migration-*.sql
 └── README.md
 ```
 
@@ -113,33 +101,12 @@ Themes are managed through React Context and persist in localStorage.
 
 ## Usage
 
-1. **Browse Skills**: View all available skills in the grid layout
-2. **Search**: Use the search bar to find specific skills
-3. **Filter**: Click "Filters" to filter by category or type
-4. **Request Trade**: Click "Request Trade" on any skill card
-5. **Change Theme**: Click the palette icon in the header to switch themes
-
-## Customization
-
-### Adding New Skills
-
-Edit `src/data/skills.js` to add or modify skills:
-
-```javascript
-{
-  id: 13,
-  title: 'Your Skill Title',
-  description: 'Skill description',
-  category: 'Tech', // Tech, Arts, Academic, Life Skills
-  type: 'Offering', // Offering or Seeking
-  user: 'Your Name',
-  location: 'Your University',
-}
-```
-
-### Modifying Themes
-
-Edit CSS variables in `src/index.css` to customize theme colors.
+1. **Browse Skills** – View and filter skills; use **Campus / Location** to filter by university.
+2. **Dashboard** – My Skills, Saved, Requests I sent, Requests I received (login required).
+3. **Request Trade** – Click "Request Trade" on a card; add an optional message.
+4. **Save** – Bookmark skills with the bookmark icon; find them under Dashboard → Saved.
+5. **Profile** – Click a user name on a card to see their skills.
+6. **Theme** – Use the palette icon in the header to switch themes.
 
 ## License
 

@@ -17,7 +17,6 @@ dist-ssr
 .env.local
 .env.production
 
-# Duplicate/legacy folder (if you have skillswap/ as a copy, don't track it)
 skillswap/
 
 # Editor directories and files

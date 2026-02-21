@@ -60,24 +60,14 @@ This guide will walk you through setting up Supabase for SkillSwap with Google O
    ```
 4. **Important**: Add `.env` to `.gitignore` if not already there!
 
-## Step 5: Install Dependencies
+## Step 5: Install and Run
 
 ```bash
 npm install
-```
-
-## Step 6: Run the Application
-
-```bash
 npm run dev
 ```
 
-## Step 7: Test Authentication
-
-1. Open `http://localhost:5173`
-2. Click "Login with Google"
-3. Complete Google OAuth flow
-4. You should be logged in!
+Open `http://localhost:5173` and sign in with Google to verify.
 
 ## Database Structure
 
@@ -129,13 +119,6 @@ npm run dev
 - Make sure you're logged in
 - Check browser console for errors
 - Verify RLS policies allow INSERT for authenticated users
-
-## Next Steps
-
-- Add more features (trade requests, messaging, etc.)
-- Set up email notifications
-- Add image uploads for skills
-- Deploy to production (Vercel/Netlify)
 
 ## Production Deployment
 
