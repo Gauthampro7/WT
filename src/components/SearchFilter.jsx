@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const CATEGORIES = ['All', 'Tech', 'Arts', 'Academic', 'Life Skills'];
 const TYPES = ['All', 'Offering', 'Seeking'];
 
-export const SearchFilter = ({ onSearch, onFilterChange }) => {
+export const SearchFilter = ({ onSearch, onFilterChange, universities = [], selectedUniversity = 'All' }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedType, setSelectedType] = useState('All');
@@ -18,12 +18,16 @@ export const SearchFilter = ({ onSearch, onFilterChange }) => {
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
-    onFilterChange({ category, type: selectedType });
+    onFilterChange({ category, type: selectedType, university: selectedUniversity });
   };
 
   const handleTypeChange = (type) => {
     setSelectedType(type);
-    onFilterChange({ category: selectedCategory, type });
+    onFilterChange({ category: selectedCategory, type, university: selectedUniversity });
+  };
+
+  const handleUniversityChange = (university) => {
+    onFilterChange({ category: selectedCategory, type: selectedType, university });
   };
 
   const clearFilters = () => {
@@ -31,8 +35,10 @@ export const SearchFilter = ({ onSearch, onFilterChange }) => {
     setSelectedCategory('All');
     setSelectedType('All');
     onSearch('');
-    onFilterChange({ category: 'All', type: 'All' });
+    onFilterChange({ category: 'All', type: 'All', university: 'All' });
   };
+
+  const hasActiveFilters = selectedCategory !== 'All' || selectedType !== 'All' || selectedUniversity !== 'All' || searchQuery;
 
   return (
     <div className="space-y-4">
@@ -66,7 +72,7 @@ export const SearchFilter = ({ onSearch, onFilterChange }) => {
           <span className="font-medium">Filters</span>
         </button>
 
-        {(selectedCategory !== 'All' || selectedType !== 'All' || searchQuery) && (
+        {hasActiveFilters && (
           <button
             onClick={clearFilters}
             className="px-4 py-2 text-theme-secondary hover:text-theme transition-colors text-sm"
@@ -124,6 +130,28 @@ export const SearchFilter = ({ onSearch, onFilterChange }) => {
                 ))}
               </div>
             </div>
+
+            {/* University / Campus Filter */}
+            {universities.length > 1 && (
+              <div>
+                <label className="block text-sm font-semibold text-theme mb-2">Campus / Location</label>
+                <div className="flex flex-wrap gap-2">
+                  {universities.map((uni) => (
+                    <button
+                      key={uni}
+                      onClick={() => handleUniversityChange(uni)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        selectedUniversity === uni
+                          ? 'bg-accent-theme text-white'
+                          : 'glass text-theme hover:bg-accent-theme/10'
+                      }`}
+                    >
+                      {uni}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

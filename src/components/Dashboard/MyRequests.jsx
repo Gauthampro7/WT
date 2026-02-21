@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Clock, CheckCircle, XCircle, X, Loader2 } from 'lucide-react';
+import { Send, Clock, CheckCircle, XCircle, X, Loader2, Check } from 'lucide-react';
 import { tradesService } from '../../services/tradesService';
 
 const statusConfig = {
   pending: { label: 'Pending', icon: Clock, color: 'text-yellow-400 bg-yellow-500/20' },
   accepted: { label: 'Accepted', icon: CheckCircle, color: 'text-green-400 bg-green-500/20' },
+  completed: { label: 'Completed', icon: CheckCircle, color: 'text-emerald-400 bg-emerald-500/20' },
   declined: { label: 'Declined', icon: XCircle, color: 'text-red-400 bg-red-500/20' },
   cancelled: { label: 'Cancelled', icon: X, color: 'text-theme-secondary bg-theme-secondary/20' },
 };
@@ -15,6 +16,7 @@ export function MyRequests() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cancelling, setCancelling] = useState(null);
+  const [completing, setCompleting] = useState(null);
 
   const fetchRequests = async () => {
     try {
@@ -43,6 +45,18 @@ export function MyRequests() {
       alert(err.message);
     } finally {
       setCancelling(null);
+    }
+  };
+
+  const handleMarkCompleted = async (id) => {
+    try {
+      setCompleting(id);
+      await tradesService.markCompleted(id);
+      await fetchRequests();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setCompleting(null);
     }
   };
 
@@ -117,6 +131,24 @@ export function MyRequests() {
                         <Loader2 size={14} className="animate-spin" />
                       ) : (
                         'Cancel'
+                      )}
+                    </motion.button>
+                  )}
+                  {req.status === 'accepted' && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleMarkCompleted(req.id)}
+                      disabled={completing === req.id}
+                      className="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 text-sm font-medium disabled:opacity-50"
+                    >
+                      {completing === req.id ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <>
+                          <Check size={14} className="inline mr-1" />
+                          Mark completed
+                        </>
                       )}
                     </motion.button>
                   )}

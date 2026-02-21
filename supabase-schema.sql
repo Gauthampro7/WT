@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS public.trade_requests (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   skill_id UUID REFERENCES public.skills(id) ON DELETE CASCADE NOT NULL,
   requester_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined', 'cancelled')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined', 'cancelled', 'completed')),
   message TEXT DEFAULT '',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
@@ -157,3 +157,26 @@ CREATE POLICY "Skill owner can update trade requests" ON public.trade_requests
 CREATE TRIGGER update_trade_requests_updated_at
   BEFORE UPDATE ON public.trade_requests
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+-- Saved/bookmarked skills
+CREATE TABLE IF NOT EXISTS public.saved_skills (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+  skill_id UUID REFERENCES public.skills(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  UNIQUE(user_id, skill_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_saved_skills_user_id ON public.saved_skills(user_id);
+CREATE INDEX IF NOT EXISTS idx_saved_skills_skill_id ON public.saved_skills(skill_id);
+
+ALTER TABLE public.saved_skills ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own saved skills" ON public.saved_skills
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own saved skills" ON public.saved_skills
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own saved skills" ON public.saved_skills
+  FOR DELETE USING (auth.uid() = user_id);

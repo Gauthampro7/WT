@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, User, MapPin } from 'lucide-react';
+import { ArrowRight, User, MapPin, Bookmark } from 'lucide-react';
 import { useState } from 'react';
 
-export const SkillCard = ({ skill, index, onRequestTrade }) => {
+export const SkillCard = ({ skill, index, onRequestTrade, isSaved, onSave, onUnsave, onUserClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
@@ -54,8 +54,9 @@ export const SkillCard = ({ skill, index, onRequestTrade }) => {
       >
         {/* Card Content */}
         <div className="flex flex-col h-full">
-          {/* Badge */}
+          {/* Badge + Bookmark */}
           <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
             <span
               className={`px-3 py-1 rounded-full text-xs font-semibold border ${getCategoryColor(
                 skill.category
@@ -72,6 +73,24 @@ export const SkillCard = ({ skill, index, onRequestTrade }) => {
             >
               {skill.type}
             </span>
+            </div>
+            {(onSave || onUnsave) && (
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (isSaved) onUnsave?.(skill.id); else onSave?.(skill.id);
+                }}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  isSaved ? 'text-accent-theme bg-accent-theme/20' : 'text-theme-secondary hover:text-theme hover:bg-accent-theme/10'
+                }`}
+                aria-label={isSaved ? 'Unsave' : 'Save'}
+              >
+                <Bookmark size={18} fill={isSaved ? 'currentColor' : 'none'} />
+              </motion.button>
+            )}
           </div>
 
           {/* Title */}
@@ -84,10 +103,14 @@ export const SkillCard = ({ skill, index, onRequestTrade }) => {
 
           {/* User Info */}
           <div className="flex items-center gap-3 mb-4 text-theme-secondary text-sm">
-            <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onUserClick?.(skill.userData || { id: skill.user_id, name: skill.user }); }}
+              className="flex items-center gap-1 hover:text-theme transition-colors text-left"
+            >
               <User size={16} />
               <span>{skill.userData?.name || skill.user || 'Unknown'}</span>
-            </div>
+            </button>
             {(skill.location || skill.userData?.location) && (
               <div className="flex items-center gap-1">
                 <MapPin size={16} />

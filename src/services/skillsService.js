@@ -49,6 +49,48 @@ export const skillsService = {
     }));
   },
 
+  // Get user profile and their active skills (for profile modal)
+  async getProfile(userId) {
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id, name, email, picture, university, location')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !user) {
+      throw new Error('User not found');
+    }
+
+    const { data: userSkills, error: skillsError } = await supabase
+      .from('skills')
+      .select('id, title, description, category, type, location, created_at')
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false });
+
+    if (skillsError) throw new Error(skillsError.message);
+
+    return {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        picture: user.picture,
+        university: user.university,
+        location: user.location,
+      },
+      skills: (userSkills || []).map((s) => ({
+        id: s.id,
+        title: s.title,
+        description: s.description,
+        category: s.category,
+        type: s.type,
+        location: s.location,
+        createdAt: s.created_at,
+      })),
+    };
+  },
+
   // Get single skill
   async getSkill(id) {
     const { data, error } = await supabase

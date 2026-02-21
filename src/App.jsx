@@ -8,9 +8,13 @@ import { SearchFilter } from './components/SearchFilter';
 import { BentoGrid } from './components/BentoGrid';
 import { SkillCard } from './components/SkillCard';
 import { TradeModal } from './components/TradeModal';
+import { RequestTradeModal } from './components/RequestTradeModal';
 import { CreateSkillModal } from './components/CreateSkillModal';
 import { skillsService } from './services/skillsService';
+import { savedSkillsService } from './services/savedSkillsService';
+import { tradesService } from './services/tradesService';
 import { Dashboard } from './components/Dashboard/Dashboard';
+import { ProfileModal } from './components/ProfileModal';
 import { Sparkles, Plus, Loader2, LayoutDashboard, Compass } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
 
@@ -21,10 +25,15 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState({ category: 'All', type: 'All' });
+  const [filters, setFilters] = useState({ category: 'All', type: 'All', university: 'All' });
   const [selectedSkill, setSelectedSkill] = useState(null);
+  const [skillForRequest, setSkillForRequest] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [savedIds, setSavedIds] = useState([]);
+  const [profileUserId, setProfileUserId] = useState(null);
+  const [pendingIncomingCount, setPendingIncomingCount] = useState(0);
 
   // Fetch skills from API
   useEffect(() => {
@@ -49,18 +58,75 @@ function AppContent() {
     fetchSkills();
   }, [searchQuery, filters.category, filters.type]);
 
-  const filteredSkills = useMemo(() => {
-    // Additional client-side filtering if needed
-    return skills;
+  // Fetch saved skill IDs when logged in
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setSavedIds([]);
+      return;
+    }
+    savedSkillsService
+      .getSavedIds()
+      .then(setSavedIds)
+      .catch(() => setSavedIds([]));
+  }, [isAuthenticated, view]);
+
+  // Pending incoming requests count (for notification badge)
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setPendingIncomingCount(0);
+      return;
+    }
+    tradesService
+      .getIncomingRequests()
+      .then((requests) => setPendingIncomingCount(requests.filter((r) => r.status === 'pending').length))
+      .catch(() => setPendingIncomingCount(0));
+  }, [isAuthenticated, view]);
+
+  const universities = useMemo(() => {
+    const set = new Set();
+    skills.forEach((s) => {
+      const u = s.userData?.university || s.userData?.location;
+      if (u && String(u).trim()) set.add(String(u).trim());
+    });
+    return ['All', ...[...set].sort()];
   }, [skills]);
 
-  const handleRequestTrade = async (skill) => {
+  const filteredSkills = useMemo(() => {
+    if (filters.university && filters.university !== 'All') {
+      return skills.filter((s) => {
+        const u = s.userData?.university || s.userData?.location;
+        return u && String(u).trim() === filters.university;
+      });
+    }
+    return skills;
+  }, [skills, filters.university]);
+
+  const handleOpenRequestModal = (skill) => {
+    setSkillForRequest(skill);
+    setIsRequestModalOpen(true);
+  };
+
+  const handleSubmitTradeRequest = async (skill, message) => {
+    await skillsService.requestTrade(skill.id, message);
+    setSelectedSkill(skill);
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async (skillId) => {
     try {
-      await skillsService.requestTrade(skill.id);
-      setSelectedSkill(skill);
-      setIsModalOpen(true);
+      await savedSkillsService.save(skillId);
+      setSavedIds((prev) => [...prev, skillId]);
     } catch (err) {
-      alert(err.message || 'Failed to request trade');
+      console.error(err);
+    }
+  };
+
+  const handleUnsave = async (skillId) => {
+    try {
+      await savedSkillsService.unsave(skillId);
+      setSavedIds((prev) => prev.filter((id) => id !== skillId));
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -118,7 +184,7 @@ function AppContent() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setView(view === 'dashboard' ? 'browse' : 'dashboard')}
-                  className={`flex items-center gap-2 glass px-4 py-2 rounded-lg font-medium ${
+                  className={`relative flex items-center gap-2 glass px-4 py-2 rounded-lg font-medium ${
                     view === 'dashboard'
                       ? 'bg-accent-theme text-white'
                       : 'text-theme hover:bg-accent-theme/10'
@@ -133,6 +199,11 @@ function AppContent() {
                     <>
                       <LayoutDashboard size={18} />
                       Dashboard
+                      {pendingIncomingCount > 0 && (
+                        <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold">
+                          {pendingIncomingCount > 99 ? '99+' : pendingIncomingCount}
+                        </span>
+                      )}
                     </>
                   )}
                 </motion.button>
@@ -147,7 +218,12 @@ function AppContent() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {view === 'dashboard' ? (
-          <Dashboard onGoToBrowse={() => setView('browse')} />
+          <Dashboard
+            onGoToBrowse={() => setView('browse')}
+            onRequestTrade={handleOpenRequestModal}
+            onUnsave={handleUnsave}
+            refreshSavedIds={() => savedSkillsService.getSavedIds().then(setSavedIds)}
+          />
         ) : (
           <>
         {/* Search and Filter */}
@@ -160,6 +236,8 @@ function AppContent() {
           <SearchFilter
             onSearch={setSearchQuery}
             onFilterChange={setFilters}
+            universities={universities}
+            selectedUniversity={filters.university}
           />
         </motion.div>
 
@@ -210,7 +288,11 @@ function AppContent() {
                 key={skill.id}
                 skill={skill}
                 index={index}
-                onRequestTrade={handleRequestTrade}
+                onRequestTrade={handleOpenRequestModal}
+                isSaved={savedIds.includes(skill.id)}
+                onSave={isAuthenticated ? handleSave : undefined}
+                onUnsave={isAuthenticated ? handleUnsave : undefined}
+                onUserClick={(user) => user?.id && setProfileUserId(user.id)}
               />
             ))}
           </BentoGrid>
@@ -232,7 +314,21 @@ function AppContent() {
         )}
       </main>
 
-      {/* Trade Modal */}
+      {/* Request Trade Modal (optional message) */}
+      <RequestTradeModal
+        isOpen={isRequestModalOpen}
+        onClose={() => { setIsRequestModalOpen(false); setSkillForRequest(null); }}
+        skill={skillForRequest}
+        onSubmit={handleSubmitTradeRequest}
+      />
+
+      <ProfileModal
+        isOpen={!!profileUserId}
+        onClose={() => setProfileUserId(null)}
+        userId={profileUserId}
+      />
+
+      {/* Trade success Modal */}
       <TradeModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

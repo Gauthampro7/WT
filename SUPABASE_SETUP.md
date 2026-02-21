@@ -44,6 +44,9 @@ This guide will walk you through setting up Supabase for SkillSwap with Google O
 **If you already ran the schema before and don’t have `trade_requests`:**
 - Run the SQL in `supabase-migration-trade-requests.sql` in the SQL Editor instead.
 
+**To add Saved skills and "Mark as completed" for trades:**  
+- Run the SQL in `supabase-migration-saved-and-completed.sql` in the SQL Editor.
+
 ## Step 4: Configure Environment Variables
 
 1. In Supabase, go to **Settings** → **API**

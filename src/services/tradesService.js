@@ -234,4 +234,36 @@ export const tradesService = {
 
     if (error) throw new Error(error.message);
   },
+
+  /** Mark an accepted trade as completed (requester or skill owner) */
+  async markCompleted(id) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error('You must be logged in');
+
+    const { data: req } = await supabase
+      .from('trade_requests')
+      .select('requester_id, skill_id, status')
+      .eq('id', id)
+      .single();
+    if (!req) throw new Error('Request not found');
+    if (req.status !== 'accepted') throw new Error('Only accepted trades can be marked completed');
+
+    const { data: skill } = await supabase
+      .from('skills')
+      .select('user_id')
+      .eq('id', req.skill_id)
+      .single();
+    const isRequester = req.requester_id === user.id;
+    const isOwner = skill?.user_id === user.id;
+    if (!isRequester && !isOwner) throw new Error('Only the requester or skill owner can mark this completed');
+
+    const { error } = await supabase
+      .from('trade_requests')
+      .update({ status: 'completed', updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) throw new Error(error.message);
+  },
 };

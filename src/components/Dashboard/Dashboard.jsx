@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Briefcase, Send, Inbox, Compass } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Send, Inbox, Compass, Bookmark } from 'lucide-react';
 import { MySkills } from './MySkills';
 import { MyRequests } from './MyRequests';
 import { IncomingRequests } from './IncomingRequests';
+import { SavedSkills } from './SavedSkills';
 import { useAuth } from '../../contexts/AuthContext';
 
 const TABS = [
   { id: 'my-skills', label: 'My Skills', icon: Briefcase },
+  { id: 'saved', label: 'Saved', icon: Bookmark },
   { id: 'my-requests', label: 'Requests I sent', icon: Send },
   { id: 'incoming', label: 'Requests I received', icon: Inbox },
 ];
 
-export function Dashboard({ onGoToBrowse }) {
+export function Dashboard({ onGoToBrowse, onRequestTrade, onUnsave, refreshSavedIds }) {
   const { isAuthenticated } = useAuth();
   const [tab, setTab] = useState('my-skills');
 
@@ -67,6 +69,14 @@ export function Dashboard({ onGoToBrowse }) {
       </div>
 
       {tab === 'my-skills' && <MySkills />}
+      {tab === 'saved' && (
+        <SavedSkills
+          onRequestTrade={onRequestTrade}
+          onUnsave={onUnsave}
+          savedIds={[]}
+          refreshSavedIds={refreshSavedIds}
+        />
+      )}
       {tab === 'my-requests' && <MyRequests />}
       {tab === 'incoming' && <IncomingRequests />}
     </div>

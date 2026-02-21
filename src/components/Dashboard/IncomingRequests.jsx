@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Inbox, Check, X, Loader2 } from 'lucide-react';
+import { Inbox, Check, X, Loader2, CheckCircle } from 'lucide-react';
 import { tradesService } from '../../services/tradesService';
 
 export function IncomingRequests() {
@@ -8,6 +8,7 @@ export function IncomingRequests() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [acting, setActing] = useState(null);
+  const [completing, setCompleting] = useState(null);
 
   const fetchRequests = async () => {
     try {
@@ -47,6 +48,18 @@ export function IncomingRequests() {
       alert(err.message);
     } finally {
       setActing(null);
+    }
+  };
+
+  const handleMarkCompleted = async (id) => {
+    try {
+      setCompleting(id);
+      await tradesService.markCompleted(id);
+      await fetchRequests();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setCompleting(null);
     }
   };
 
@@ -163,20 +176,40 @@ export function IncomingRequests() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: (pending.length + i) * 0.05 }}
-                  className="glass rounded-2xl p-4 opacity-80"
+                  className="glass rounded-2xl p-4 opacity-80 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-theme">
-                        {req.requester?.name || 'Someone'} → {req.skill?.title}
-                      </p>
-                      <p className="text-sm text-theme-secondary capitalize">{req.status}</p>
-                    </div>
+                  <div>
+                    <p className="font-medium text-theme">
+                      {req.requester?.name || 'Someone'} → {req.skill?.title}
+                    </p>
+                    <p className="text-sm text-theme-secondary capitalize">{req.status}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {req.status === 'accepted' && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleMarkCompleted(req.id)}
+                        disabled={completing === req.id}
+                        className="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 text-sm font-medium disabled:opacity-50 flex items-center gap-1"
+                      >
+                        {completing === req.id ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <>
+                            <CheckCircle size={14} />
+                            Mark completed
+                          </>
+                        )}
+                      </motion.button>
+                    )}
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        req.status === 'accepted'
-                          ? 'bg-green-500/20 text-green-400'
-                          : 'bg-red-500/20 text-red-400'
+                        req.status === 'completed'
+                          ? 'bg-emerald-500/20 text-emerald-400'
+                          : req.status === 'accepted'
+                            ? 'bg-green-500/20 text-green-400'
+                            : 'bg-red-500/20 text-red-400'
                       }`}
                     >
                       {req.status}
