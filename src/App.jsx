@@ -15,7 +15,7 @@ import { savedSkillsService } from './services/savedSkillsService';
 import { tradesService } from './services/tradesService';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { ProfileModal } from './components/ProfileModal';
-import { Sparkles, Plus, Loader2, LayoutDashboard, Compass } from 'lucide-react';
+import { Sparkles, Plus, Loader2, LayoutDashboard, Compass, Zap, Users, ArrowRight } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
 
 function AppContent() {
@@ -153,9 +153,14 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-theme transition-colors duration-300">
+    <div className="min-h-screen bg-theme transition-colors duration-300 relative">
+      {/* Animated background orbs */}
+      <div className="bg-orb bg-orb-1" />
+      <div className="bg-orb bg-orb-2" />
+      <div className="bg-orb bg-orb-3" />
+
       {/* Header */}
-      <header className="sticky top-0 z-30 glass border-b border-theme backdrop-blur-xl">
+      <header className="sticky top-0 z-40 glass border-b border-theme backdrop-blur-xl relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <motion.div
@@ -216,7 +221,7 @@ function AppContent() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {view === 'dashboard' ? (
           <Dashboard
             onGoToBrowse={() => setView('browse')}
@@ -226,6 +231,69 @@ function AppContent() {
           />
         ) : (
           <>
+        {/* Hero Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12 pt-4"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="hero-badge inline-flex items-center gap-2 glass px-4 py-2 rounded-full text-sm font-medium text-accent-theme mb-6 border border-accent-theme/30"
+          >
+            <Zap size={14} className="text-accent-theme" />
+            Student Skill Exchange Platform
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="text-5xl sm:text-6xl font-extrabold text-theme mb-4 leading-tight"
+          >
+            Exchange Skills,{' '}
+            <span className="gradient-text">Grow Together</span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="text-lg text-theme-secondary max-w-xl mx-auto mb-8"
+          >
+            Connect with students who have what you need. Offer what you know, discover what you don't.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="flex items-center justify-center gap-6"
+          >
+            <div className="flex items-center gap-2 glass px-4 py-2 rounded-full text-sm text-theme-secondary">
+              <Sparkles size={16} className="text-accent-theme" />
+              <span>{loading ? '...' : filteredSkills.length} skills available</span>
+            </div>
+            <div className="flex items-center gap-2 glass px-4 py-2 rounded-full text-sm text-theme-secondary">
+              <Users size={16} className="text-accent-theme" />
+              <span>Free to join</span>
+            </div>
+            {!isAuthenticated && (
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+                className="flex items-center gap-2 btn-gradient text-white px-5 py-2 rounded-full text-sm font-semibold cursor-pointer"
+                onClick={() => {}}
+              >
+                Get started <ArrowRight size={14} />
+              </motion.div>
+            )}
+          </motion.div>
+        </motion.div>
+
         {/* Search and Filter */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

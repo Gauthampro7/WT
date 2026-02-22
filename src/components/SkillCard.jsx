@@ -1,20 +1,21 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, User, MapPin, Bookmark } from 'lucide-react';
+import { ArrowRight, MapPin, Bookmark, Code, Palette, BookOpen, Heart, Layers } from 'lucide-react';
 import { useState } from 'react';
+
+const CATEGORY_CONFIG = {
+  Tech:          { color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',   Icon: Code },
+  Arts:          { color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', Icon: Palette },
+  Academic:      { color: 'bg-green-500/20 text-green-400 border-green-500/30',  Icon: BookOpen },
+  'Life Skills': { color: 'bg-orange-500/20 text-orange-400 border-orange-500/30', Icon: Heart },
+};
+
+const DEFAULT_CATEGORY = { color: 'bg-gray-500/20 text-gray-400 border-gray-500/30', Icon: Layers };
 
 export const SkillCard = ({ skill, index, onRequestTrade, isSaved, onSave, onUnsave, onUserClick }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  const getCategoryColor = (category) => {
-    const colors = {
-      Tech: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-      Arts: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-      Academic: 'bg-green-500/20 text-green-400 border-green-500/30',
-      'Life Skills': 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-    };
-    return colors[category] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-  };
+  const { color: categoryColor, Icon: CategoryIcon } = CATEGORY_CONFIG[skill.category] || DEFAULT_CATEGORY;
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -28,40 +29,38 @@ export const SkillCard = ({ skill, index, onRequestTrade, isSaved, onSave, onUns
     setMousePosition({ x: 0, y: 0 });
   };
 
+  const avatarUrl = skill.userData?.picture;
+  const userName  = skill.userData?.name || skill.user || 'Unknown';
+  const userLocation = skill.location || skill.userData?.location;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
+      transition={{ delay: index * 0.07, duration: 0.5 }}
       whileHover={{ scale: 1.02 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={handleMouseLeave}
       onMouseMove={handleMouseMove}
-      className="glass-card rounded-2xl p-6 cursor-pointer group relative overflow-hidden"
-      style={{
-        perspective: '1000px',
-      }}
+      className={`glass-card rounded-2xl p-6 cursor-pointer group relative overflow-hidden flex flex-col ${
+        skill.type === 'Offering' ? 'card-offering' : 'card-seeking'
+      }`}
+      style={{ perspective: '1000px' }}
     >
       <motion.div
         animate={{
           rotateX: isHovered ? mousePosition.y * -10 : 0,
-          rotateY: isHovered ? mousePosition.x * 10 : 0,
+          rotateY: isHovered ? mousePosition.x * 10  : 0,
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        style={{
-          transformStyle: 'preserve-3d',
-        }}
+        style={{ transformStyle: 'preserve-3d' }}
+        className="flex flex-col flex-1"
       >
-        {/* Card Content */}
-        <div className="flex flex-col h-full">
-          {/* Badge + Bookmark */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold border ${getCategoryColor(
-                skill.category
-              )}`}
-            >
+        {/* Badges + Bookmark */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${categoryColor}`}>
+              <CategoryIcon size={12} />
               {skill.category}
             </span>
             <span
@@ -73,73 +72,90 @@ export const SkillCard = ({ skill, index, onRequestTrade, isSaved, onSave, onUns
             >
               {skill.type}
             </span>
-            </div>
-            {(onSave || onUnsave) && (
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (isSaved) onUnsave?.(skill.id); else onSave?.(skill.id);
-                }}
-                className={`p-1.5 rounded-lg transition-colors ${
-                  isSaved ? 'text-accent-theme bg-accent-theme/20' : 'text-theme-secondary hover:text-theme hover:bg-accent-theme/10'
-                }`}
-                aria-label={isSaved ? 'Unsave' : 'Save'}
-              >
-                <Bookmark size={18} fill={isSaved ? 'currentColor' : 'none'} />
-              </motion.button>
-            )}
           </div>
 
-          {/* Title */}
-          <h3 className="text-xl font-bold text-theme mb-2">{skill.title}</h3>
-
-          {/* Description */}
-          <p className="text-theme-secondary text-sm mb-4 flex-grow">
-            {skill.description}
-          </p>
-
-          {/* User Info */}
-          <div className="flex items-center gap-3 mb-4 text-theme-secondary text-sm">
-            <button
+          {(onSave || onUnsave) && (
+            <motion.button
               type="button"
-              onClick={(e) => { e.stopPropagation(); onUserClick?.(skill.userData || { id: skill.user_id, name: skill.user }); }}
-              className="flex items-center gap-1 hover:text-theme transition-colors text-left"
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isSaved) onUnsave?.(skill.id);
+                else onSave?.(skill.id);
+              }}
+              className={`p-1.5 rounded-lg transition-colors ${
+                isSaved
+                  ? 'text-accent-theme bg-accent-theme/20'
+                  : 'text-theme-secondary hover:text-theme hover:bg-accent-theme/10'
+              }`}
+              aria-label={isSaved ? 'Unsave' : 'Save'}
             >
-              <User size={16} />
-              <span>{skill.userData?.name || skill.user || 'Unknown'}</span>
-            </button>
-            {(skill.location || skill.userData?.location) && (
-              <div className="flex items-center gap-1">
-                <MapPin size={16} />
-                <span>{skill.location || skill.userData?.location}</span>
-              </div>
-            )}
-          </div>
+              <Bookmark size={18} fill={isSaved ? 'currentColor' : 'none'} />
+            </motion.button>
+          )}
+        </div>
 
-          {/* Action Button */}
-          <motion.button
-            whileHover={{ x: 4 }}
-            whileTap={{ scale: 0.95 }}
+        {/* Title */}
+        <h3 className="text-xl font-bold text-theme mb-2 leading-snug">{skill.title}</h3>
+
+        {/* Description — clamped to 3 lines for uniform card height */}
+        <p className="text-theme-secondary text-sm mb-4 flex-grow line-clamp-3">
+          {skill.description}
+        </p>
+
+        {/* User Info with avatar */}
+        <div className="flex items-center gap-3 mb-4 text-theme-secondary text-sm">
+          <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onRequestTrade(skill);
+              onUserClick?.(skill.userData || { id: skill.user_id, name: skill.user });
             }}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-accent-theme text-white font-semibold transition-all group-hover:glow-theme"
+            className="flex items-center gap-2 hover:text-theme transition-colors text-left"
           >
-            Request Trade
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </motion.button>
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={userName}
+                className="w-6 h-6 rounded-full object-cover ring-1 ring-accent-theme/30"
+              />
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-accent-theme/20 flex items-center justify-center text-accent-theme text-xs font-bold ring-1 ring-accent-theme/30">
+                {userName[0]?.toUpperCase()}
+              </div>
+            )}
+            <span className="font-medium">{userName}</span>
+          </button>
+
+          {userLocation && (
+            <div className="flex items-center gap-1 ml-auto">
+              <MapPin size={14} />
+              <span className="truncate max-w-[100px]">{userLocation}</span>
+            </div>
+          )}
         </div>
+
+        {/* Action Button */}
+        <motion.button
+          whileHover={{ x: 4 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRequestTrade(skill);
+          }}
+          className="btn-gradient flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold w-full"
+        >
+          Request Trade
+          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+        </motion.button>
       </motion.div>
 
-      {/* Glow Effect */}
+      {/* Radial glow on hover */}
       <motion.div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-2xl"
         style={{
-          background: `radial-gradient(circle at ${isHovered ? '50%' : '0%'} 50%, var(--glow) 0%, transparent 70%)`,
+          background: `radial-gradient(circle at 50% 80%, var(--glow) 0%, transparent 70%)`,
         }}
       />
     </motion.div>

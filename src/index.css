@@ -237,3 +237,97 @@ html {
 .animate-pulse-glow {
   animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* Animated background orbs */
+@keyframes orb-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(60px, -80px) scale(1.1); }
+  66%       { transform: translate(-40px, 40px) scale(0.95); }
+}
+
+@keyframes orb-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(-70px, 60px) scale(1.05); }
+  66%       { transform: translate(50px, -50px) scale(1.1); }
+}
+
+@keyframes orb-float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%       { transform: translate(40px, 70px) scale(1.08); }
+}
+
+.bg-orb {
+  position: fixed;
+  border-radius: 9999px;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+}
+
+.bg-orb-1 {
+  width: 600px;
+  height: 600px;
+  top: -150px;
+  left: -150px;
+  background: var(--accent);
+  animation: orb-float-1 18s ease-in-out infinite;
+}
+
+.bg-orb-2 {
+  width: 500px;
+  height: 500px;
+  bottom: -100px;
+  right: -100px;
+  background: var(--accent);
+  animation: orb-float-2 22s ease-in-out infinite;
+}
+
+.bg-orb-3 {
+  width: 350px;
+  height: 350px;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--glow);
+  animation: orb-float-3 16s ease-in-out infinite;
+  opacity: 0.1;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--glow) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient button */
+.btn-gradient {
+  background: linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 60%, purple) 100%);
+  transition: opacity 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.btn-gradient:hover {
+  opacity: 0.92;
+  box-shadow: 0 0 24px var(--glow);
+}
+
+/* Hero section floating badge */
+@keyframes badge-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+.hero-badge {
+  animation: badge-float 3s ease-in-out infinite;
+}
+
+/* Skill card left-border accent */
+.card-offering {
+  border-left: 3px solid rgba(34, 197, 94, 0.6);
+}
+
+.card-seeking {
+  border-left: 3px solid rgba(234, 179, 8, 0.6);
+}
