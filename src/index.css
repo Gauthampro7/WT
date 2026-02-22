@@ -20,7 +20,7 @@
   --theme-dark-surface: #1e293b;
   --theme-dark-card: #1e293b;
   --theme-dark-text: #f1f5f9;
-  --theme-dark-text-secondary: #94a3b8;
+  --theme-dark-text-secondary: #cbd5e1;
   --theme-dark-accent: #60a5fa;
   --theme-dark-accent-hover: #3b82f6;
   --theme-dark-border: rgba(255, 255, 255, 0.1);
@@ -32,7 +32,7 @@
   --theme-midnight-surface: #1e293b;
   --theme-midnight-card: rgba(30, 41, 59, 0.6);
   --theme-midnight-text: #e2e8f0;
-  --theme-midnight-text-secondary: #94a3b8;
+  --theme-midnight-text-secondary: #cbd5e1;
   --theme-midnight-accent: #64748b;
   --theme-midnight-accent-hover: #475569;
   --theme-midnight-border: rgba(255, 255, 255, 0.1);
@@ -44,7 +44,7 @@
   --theme-cyberpunk-surface: #0a0a0a;
   --theme-cyberpunk-card: rgba(10, 10, 10, 0.8);
   --theme-cyberpunk-text: #ffffff;
-  --theme-cyberpunk-text-secondary: #a0a0a0;
+  --theme-cyberpunk-text-secondary: #e5e5e5;
   --theme-cyberpunk-accent: #ff00ff;
   --theme-cyberpunk-accent-hover: #ff00ff;
   --theme-cyberpunk-border: rgba(0, 255, 255, 0.5);
