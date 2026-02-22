@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap — Project Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --card: rgba(22, 22, 35, 0.8);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f0f0f5;
+      --text-muted: #9898a6;
+      --accent: #8b5cf6;
+      --accent-2: #06b6d4;
+      --accent-3: #10b981;
+      --gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 50%, #10b981 100%);
+      --glow: 0 0 60px rgba(139, 92, 246, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .gradient-orb {
+      position: fixed;
+      width: 80vmax;
+      height: 80vmax;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 60%);
+      top: -30vmax;
+      right: -20vmax;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .gradient-orb-2 {
+      position: fixed;
+      width: 60vmax;
+      height: 60vmax;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
+      bottom: -20vmax;
+      left: -15vmax;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    /* ----- Header / Hero ----- */
+    .hero {
+      text-align: center;
+      padding: 4rem 0 5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero .sub {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .hero .badge {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.4rem 1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      color: var(--accent-2);
+      font-weight: 500;
+    }
+
+    /* ----- Nav ----- */
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 0;
+      margin-bottom: 2rem;
+      z-index: 10;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 1rem;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* ----- Sections ----- */
+    section {
+      margin-bottom: 3.5rem;
+    }
+
+    section h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    section h2::before {
+      content: '';
+      width: 4px;
+      height: 1.4em;
+      background: var(--gradient);
+      border-radius: 4px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--glow);
+    }
+
+    .card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent-2);
+      margin-bottom: 0.6rem;
+    }
+
+    .card p, .card li {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card ul {
+      padding-left: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    /* ----- Code ----- */
+    pre, code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+    }
+
+    code {
+      background: rgba(139, 92, 246, 0.12);
+      color: var(--accent-2);
+      padding: 0.15rem 0.4rem;
+      border-radius: 6px;
+    }
+
+    pre code {
+      background: none;
+      color: var(--text-muted);
+      padding: 0;
+    }
+
+    .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    /* ----- Grid ----- */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .grid-2 .card {
+      margin-bottom: 0;
+    }
+
+    /* ----- Table ----- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--accent-2);
+      font-weight: 600;
+    }
+
+    td {
+      color: var(--text-muted);
+    }
+
+    /* ----- Flow ----- */
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin: 1rem 0;
+    }
+
+    .flow-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.9rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+
+    .flow-arrow {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ----- Footer ----- */
+    footer {
+      text-align: center;
+      padding: 3rem 0 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      .wrap { padding: 2rem 1rem 3rem; }
+      .hero { padding: 2rem 0 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <div class="gradient-orb"></div>
+  <div class="gradient-orb-2"></div>
+
+  <div class="wrap">
+    <header class="hero">
+      <h1>SkillSwap</h1>
+      <p class="sub">Student Skill Exchange Platform</p>
+      <span class="badge">College Project — Full‑Stack Web Application</span>
+    </header>
+
+    <nav>
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#frontend">Frontend</a></li>
+        <li><a href="#backend">Backend</a></li>
+        <li><a href="#database">Database & SQL</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </nav>
+
+    <!-- Overview -->
+    <section id="overview">
+      <h2>Overview</h2>
+      <div class="card">
+        <p>
+          <strong>SkillSwap</strong> is a full‑stack web application that lets college students list skills they can offer (e.g. tutoring, guitar, coding) or skills they are seeking, and request trades with other students. The project focuses on a polished user experience, secure authentication, and a clear separation between frontend and backend.
+        </p>
+        <p style="margin-top: 1rem;">
+          We built it as a single-page application (SPA) with <strong>React</strong> on the frontend and <strong>Supabase</strong> (PostgreSQL + Auth) on the backend, using <strong>SQL</strong> for schema, indexes, triggers, and Row Level Security (RLS).
+        </p>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features">
+      <h2>Features</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Core</h3>
+          <ul>
+            <li>Browse skills with real-time search and filters (category, type, campus)</li>
+            <li>Create, edit, and delete your own skills (Offering / Seeking)</li>
+            <li>Request trades with an optional message</li>
+            <li>Accept, decline, or mark trades as completed</li>
+            <li>Save (bookmark) skills and view them in Dashboard</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>UX & Design</h3>
+          <ul>
+            <li>5 themes: Light, Dark, Midnight, Cyberpunk, Emerald</li>
+            <li>Glassmorphic UI with backdrop blur and soft borders</li>
+            <li>3D hover tilt on skill cards (Framer Motion)</li>
+            <li>Confetti on successful trade request</li>
+            <li>Responsive layout and accessibility-friendly contrast</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Auth & Security</h3>
+          <ul>
+            <li>Google OAuth via Supabase Auth</li>
+            <li>Row Level Security (RLS) on all tables</li>
+            <li>Users can only modify their own data; public read for active content</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Dashboard</h3>
+          <ul>
+            <li>My Skills — manage your listings</li>
+            <li>Saved — bookmarked skills</li>
+            <li>Requests I sent — status (pending / accepted / declined / completed)</li>
+            <li>Requests I received — accept, decline, or mark completed</li>
+            <li>Notification badge for pending incoming requests</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Frontend -->
+    <section id="frontend">
+      <h2>Frontend</h2>
+      <div class="card">
+        <div class="label">Tech stack</div>
+        <p><strong>React 18</strong> (UI), <strong>Vite 7</strong> (build & dev server), <strong>Tailwind CSS</strong> (utility-first styling with CSS variables for theming), <strong>Framer Motion</strong> (animations), <strong>Lucide React</strong> (icons), <strong>Canvas Confetti</strong> (celebration effect).</p>
+      </div>
+      <div class="card">
+        <h3>Structure</h3>
+        <ul>
+          <li><code>src/components/</code> — Reusable UI (SkillCard, SearchFilter, BentoGrid, ThemeSelector, LoginButton, modals, Dashboard tabs)</li>
+          <li><code>src/contexts/</code> — ThemeContext (theme state), AuthContext (user session from Supabase Auth)</li>
+          <li><code>src/services/</code> — skillsService, tradesService, savedSkillsService (all call Supabase client)</li>
+          <li><code>src/lib/supabase.js</code> — Supabase client init with env URL and anon key</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>How we built the UI</h3>
+        <p>We use a single <code>App.jsx</code> with two main views: <strong>Browse</strong> (search, filters, grid of SkillCards) and <strong>Dashboard</strong> (tabs: My Skills, Saved, Requests sent, Requests received). Modals handle: Request Trade (optional message), Trade success (confetti), Create Skill, and User Profile. Theming is done via CSS variables in <code>index.css</code>; the ThemeProvider toggles a class on the document root (e.g. <code>theme-dark</code>, <code>theme-cyberpunk</code>) so all components use the same palette.</p>
+      </div>
+    </section>
+
+    <!-- Backend -->
+    <section id="backend">
+      <h2>Backend</h2>
+      <div class="card">
+        <h3>Why Supabase</h3>
+        <p>We chose <strong>Supabase</strong> so we could avoid writing a separate backend server. It provides <strong>PostgreSQL</strong> (database), <strong>Auth</strong> (including Google OAuth), and a JavaScript client that the frontend calls directly. All business rules and security are enforced in the database with <strong>Row Level Security (RLS)</strong> and triggers.</p>
+      </div>
+      <div class="card">
+        <h3>Authentication</h3>
+        <p>Users sign in with <strong>Google OAuth</strong> via Supabase Auth. On first sign-in, a trigger creates a row in our <code>public.users</code> table (id, name, email, picture, university, location) so we can join skills and trade requests to profiles. The frontend stores the session and passes the JWT automatically on every Supabase request; RLS uses <code>auth.uid()</code> to restrict access.</p>
+      </div>
+      <div class="card">
+        <h3>API layer (no custom server)</h3>
+        <p>We do not run an Express or Node server. The React app talks to Supabase using <code>@supabase/supabase-js</code>: we call <code>supabase.from('skills').select(...)</code>, <code>supabase.from('trade_requests').insert(...)</code>, etc. Filtering (category, type, search) is done via Supabase query builders; RLS ensures users only see and change what they are allowed to.</p>
+      </div>
+    </section>
+
+    <!-- Database & SQL -->
+    <section id="database">
+      <h2>Database & SQL</h2>
+      <div class="card">
+        <h3>Tables</h3>
+        <table>
+          <thead>
+            <tr><th>Table</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>users</code></td><td>Profiles (id from auth.users, name, email, picture, university, location). Populated by trigger on signup.</td></tr>
+            <tr><td><code>skills</code></td><td>Listings: title, description, category, type, location, status, user_id. Categories: Tech, Arts, Academic, Life Skills. Types: Offering, Seeking.</td></tr>
+            <tr><td><code>trade_requests</code></td><td>Requests: skill_id, requester_id, status (pending/accepted/declined/cancelled/completed), message. UNIQUE(skill_id, requester_id).</td></tr>
+            <tr><td><code>saved_skills</code></td><td>Bookmarks: user_id, skill_id. UNIQUE(user_id, skill_id).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Schema (excerpt)</h3>
+        <div class="label">Skills table</div>
+        <pre><code>CREATE TABLE public.skills (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN ('Tech', 'Arts', 'Academic', 'Life Skills')),
+  type TEXT NOT NULL CHECK (type IN ('Offering', 'Seeking')),
+  location TEXT DEFAULT '',
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'completed', 'cancelled')),
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
+);</code></pre>
+      </div>
+      <div class="card">
+        <h3>Indexes & full-text search</h3>
+        <p>We added indexes on <code>user_id</code>, <code>category</code>, <code>type</code>, <code>status</code>, and <code>created_at</code> for faster queries. For search we use a GIN index on <code>to_tsvector('english', title || ' ' || description)</code> and filter with <code>query.$text = { $search: searchTerm }</code> in the client.</p>
+      </div>
+      <div class="card">
+        <h3>Row Level Security (RLS)</h3>
+        <p>Every table has RLS enabled. Examples:</p>
+        <ul>
+          <li><strong>users</strong>: anyone can SELECT; only own row for UPDATE/INSERT.</li>
+          <li><strong>skills</strong>: everyone can SELECT where status = 'active'; users can SELECT/UPDATE/DELETE their own; authenticated users can INSERT with their own user_id.</li>
+          <li><strong>trade_requests</strong>: requesters see their requests; skill owners see requests on their skills; only authenticated users can INSERT (as requester); requester can UPDATE (e.g. cancel); skill owner can UPDATE (accept/decline/complete).</li>
+          <li><strong>saved_skills</strong>: users see and manage only their own rows.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Triggers</h3>
+        <p><strong>handle_new_user</strong>: AFTER INSERT on <code>auth.users</code>, inserts a row into <code>public.users</code> with name, email, picture from OAuth metadata. <strong>handle_updated_at</strong>: BEFORE UPDATE on users, skills, trade_requests sets <code>updated_at = now()</code>.</p>
+      </div>
+    </section>
+
+    <!-- Architecture -->
+    <section id="architecture">
+      <h2>Architecture</h2>
+      <div class="card">
+        <h3>Data flow (high level)</h3>
+        <div class="flow">
+          <span class="flow-item">User (browser)</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-item">React + Supabase client</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-item">Supabase API (Postgres + Auth)</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-item">RLS policies</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-item">Tables</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Trade request flow</h3>
+        <div class="flow">
+          <span class="flow-item">Browse → Request Trade</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-item">Modal (optional message)</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-item">tradesService.create(skillId, message)</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-item">INSERT trade_requests</span>
+          <span class="flow-arrow">→</span>
+          <span class="flow-item">Success modal + confetti</span>
+        </div>
+        <p style="margin-top: 0.75rem;">Skill owner sees the request in Dashboard → Requests I received; they can Accept or Decline. Either side can later Mark as completed.</p>
+      </div>
+    </section>
+
+    <!-- Conclusion -->
+    <section id="conclusion">
+      <h2>Conclusion</h2>
+      <div class="card">
+        <p>
+          We built a complete, production-style skill exchange platform: <strong>frontend</strong> (React, Vite, Tailwind, Framer Motion), <strong>backend</strong> (Supabase: PostgreSQL + Auth), and <strong>SQL</strong> (schema, indexes, RLS, triggers). The app is secure (RLS, OAuth), responsive, and visually polished with multiple themes and animations. It is suitable as a college project demonstrating full-stack development, database design, and modern web tooling.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      SkillSwap — College Project Presentation · Full-Stack Web Application
+    </footer>
+  </div>
+</body>
+</html>
